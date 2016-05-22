@@ -58,6 +58,8 @@ int main(int argc,char **argv)
 {
 	int fd;  
 	int cmd;
+	int arg = 0;
+	tune_to_t tmp;
 
 	if (process_cmdline(argc, argv) < 0) {
 		return -1;
@@ -74,18 +76,22 @@ int main(int argc,char **argv)
 		break;
 
 		case 1:
-			//cmd = RADIODEV_IOCINIT;
 		break;
 
 		case 2:
 			cmd = RADIODEV_IOCTURNTO;
+			tmp.mode = 2;
+			tmp.freq = 2512;
 		break;
 
 		default:
 		break;
 	}
 
-	ioctl(fd, cmd, radio_arg);
+	if (ioctl(fd, cmd, &tmp) < 0) {
+		printf("Call cmd fail\n");
+		return -1;
+	}
 
 	close(fd);
 
