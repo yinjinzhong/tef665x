@@ -24,9 +24,33 @@
 #define VERSION "ver: 0.0.1"
 #endif
 
+#define CLEAR(x) memset (&(x), 0, sizeof (x))
+
 int radio_cmd, radio_arg;
 static char* deviceName = "/dev/tef665x";
 
+static int continuous = 0;
+
+
+/**
+SIGINT interput handler
+*/
+void StopContCapture(int sig_id) {
+	printf("stoping continuous capture\n");
+	continuous = 0;
+}
+
+void InstallSIGINTHandler() {
+	struct sigaction sa;
+	CLEAR(sa);
+	
+	sa.sa_handler = StopContCapture;
+	if(sigaction(SIGINT, &sa, 0) != 0)
+	{
+		fprintf(stderr,"could not install SIGINT handler, continuous capture disabled");
+		continuous = 0;
+	}
+}
 
 int process_cmdline(int argc, char **argv)
 {
@@ -85,12 +109,13 @@ static void usage(FILE* fp, int argc, char** argv)
 		"-m | --mmap          Use memory mapped buffers\n"
 		"-r | --read          Use read() calls\n"
 		"-u | --userptr       Use application allocated buffers\n"
+		"-c | --continuous    Do continous capture, stop with SIGINT.\n"
 		"-v | --version       Print version\n"
 		"",
 		argv[0]);
 	}
 
-static const char short_options [] = "d:ho:q:mruW:H:I:vc";
+static const char short_options [] = "d:ho:q:mruW:H:I:ea:vc";
 
 static const struct option
 long_options [] = {
@@ -101,7 +126,10 @@ long_options [] = {
 	{ "mmap",       no_argument,            NULL,           'm' },
 	{ "read",       no_argument,            NULL,           'r' },
 	{ "userptr",    no_argument,            NULL,           'u' },
+	{ "command",    required_argument,	NULL,           'e' },
+	{ "arg",    	required_argument,	NULL,           'a' },
 	{ "version",	no_argument,		NULL,		'v' },
+	{ "continuous",	no_argument,		NULL,		'c' },
 	{ 0, 0, 0, 0 }
 };
 
@@ -109,6 +137,9 @@ int main(int argc,char **argv)
 {
 	int fd;  
 	int cmd;
+
+	radio_cmd=0;
+	radio_arg=0;
 
 	for (;;) {
 		int index, c = 0;
@@ -131,7 +162,6 @@ int main(int argc,char **argv)
 				break;
 
 			case 'h':
-				// print help
 				usage(stdout, argc, argv);
 				exit(EXIT_SUCCESS);
 
@@ -162,6 +192,20 @@ int main(int argc,char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 
+			case 'e':
+				radio_cmd = atoi(optarg);
+				break;
+
+			case 'c':
+				// set flag for continuous capture, interuptible by sigint
+				continuous = 1;
+				InstallSIGINTHandler();
+				break;
+
+			case 'a':
+				radio_arg = atoi(optarg);
+				break;
+
 			default:
 				usage(stderr, argc, argv);
 				exit(EXIT_FAILURE);
@@ -171,8 +215,7 @@ int main(int argc,char **argv)
 	fd = radio_setup();
 	sleep(1);
 
-
-/*	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);*/
+	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
 /*	switch (radio_cmd) {*/
 /*		case 0:*/
 /*			cmd = RADIODEV_IOCGETSTATUS;*/
