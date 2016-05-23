@@ -42,7 +42,7 @@ int process_cmdline(int argc, char **argv)
 	return 0;
 }
 
-int radio_setup(void)
+int radio_start(void)
 {
 	int fd = 0;
 
@@ -52,6 +52,22 @@ int radio_setup(void)
 	}
 
 	return fd;
+}
+
+int radio_close(int fd)
+{
+	return close(fd);
+}
+
+void radio_cmd (void)
+{
+	printf("\n\nTEF665x -- NXP radio test help --\n\n" \
+		"Syntax: radio-test\n"\
+		" -c <radio ctrl command>\n" \
+		" -a <radio ctrl arg>\n" \
+		" -d <radio select, /dev/radio>\n");
+
+
 }
 
 int main(int argc,char **argv)
@@ -66,7 +82,7 @@ int main(int argc,char **argv)
 		return -1;
 	}
 
-	fd = radio_setup();
+	fd = radio_start();
 
 	sleep(1);
 
@@ -79,9 +95,6 @@ int main(int argc,char **argv)
 				return -1;
 			}
 			printf("The status = %01x\n", status);
-		break;
-
-		case 1:
 		break;
 
 		case 2:
@@ -99,7 +112,7 @@ int main(int argc,char **argv)
 		break;
 	}
 
-	close(fd);
+	radio_close(fd);
 
 	return 0;
 } 
