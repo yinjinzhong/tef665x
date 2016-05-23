@@ -60,6 +60,7 @@ int main(int argc,char **argv)
 	int cmd;
 	int arg = 0;
 	tune_to_t tmp;
+	tune_status status;
 
 	if (process_cmdline(argc, argv) < 0) {
 		return -1;
@@ -72,7 +73,12 @@ int main(int argc,char **argv)
 	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
 	switch (radio_cmd) {
 		case 0:
-			cmd = RADIODEV_IOCGETSTATUS;
+			cmd = RADIODEV_IOCGETOPSTATUS;
+			if (ioctl(fd, cmd, &status) < 0) {
+				printf("Call cmd fail\n");
+				return -1;
+			}
+			printf("The status = %01x\n", status);
 		break;
 
 		case 1:
@@ -82,15 +88,15 @@ int main(int argc,char **argv)
 			cmd = RADIODEV_IOCTURNTO;
 			tmp.mode = 2;
 			tmp.freq = 2512;
+
+			if (ioctl(fd, cmd, &tmp) < 0) {
+				printf("Call cmd fail\n");
+				return -1;
+			}
 		break;
 
 		default:
 		break;
-	}
-
-	if (ioctl(fd, cmd, &tmp) < 0) {
-		printf("Call cmd fail\n");
-		return -1;
 	}
 
 	close(fd);
