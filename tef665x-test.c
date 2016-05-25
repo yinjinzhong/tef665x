@@ -13,7 +13,7 @@
 
 int r_s_start = 9000;
 int r_s_stop  = 10800;
-int vol = 100;
+int vol = 10;
 
 int radio_cmd, radio_arg;
 char radio_device[100] = "/dev/tef665x";
@@ -49,7 +49,7 @@ int process_cmdline(int argc, char **argv)
 			" -d <radio select, /dev/radio>\n"\
 			" -s <radio serch start,[9000]>\n"\
 			" -e <radio serch end,[10800]>\n"\
-			" -v <radio volume,[100]>\n");
+			" -v <radio volume,[10]>\n");
 			return -1;
 		}
 	}
@@ -98,15 +98,17 @@ int main(int argc,char **argv)
 	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
 	switch (radio_cmd) {
 		case 0:
+		{
 			cmd = RADIODEV_IOCGETOPSTATUS;
 			if (ioctl(fd, cmd, &status) < 0) {
 				printf("Call cmd fail\n");
 				return -1;
 			}
 			printf("The status = %01x\n", status);
-		break;
-
+			break;
+		}
 		case 2:
+		{
 			/* 获取设备状态 */
 			cmd = RADIODEV_IOCGETOPSTATUS;
 			if (ioctl(fd, cmd, &status) < 0) {
@@ -163,10 +165,10 @@ int main(int argc,char **argv)
 				printf("Call cmd fail\n");
 				return -1;
 			}
-		break;
-
+			break;
+		}
 		default:
-		break;
+			break;
 	}
 
 
