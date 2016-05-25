@@ -109,7 +109,7 @@ int main(int argc,char **argv)
 		}
 		case 2:
 		{
-			/* 读取操作结果 */
+			/* Read the opration results */
 			cmd = RADIODEV_IOCGETOPSTATUS;
 			if (ioctl(fd, cmd, &status) < 0) {
 				printf("Call cmd fail\n");
@@ -120,7 +120,7 @@ int main(int argc,char **argv)
 			for (freq_s = r_s_start; freq_s < r_s_stop; freq_s+=10)
 			{
 				printf ("Set freq = %d\n", freq_s);
-				/* 开始搜台 */
+				/* Start search */
 				cmd = RADIODEV_IOCTURNTO;
 				tmp.mode = 2;
 				tmp.freq = freq_s;
@@ -132,7 +132,7 @@ int main(int argc,char **argv)
 
 				usleep(60000);
 
-				/* 读取收台结果 */
+				/* Read search results */
 				cmd = RADIODEV_IOCGETDATA;
 				qdata.fm = isfm;
 				if (ioctl(fd, cmd, &qdata) < 0) {
@@ -147,7 +147,7 @@ int main(int argc,char **argv)
 				else break;
 			}
 
-			/* 跳转到新搜到的频率 */
+			/* Reset to new frequency */
 			cmd = RADIODEV_IOCTURNTO;
 			tmp.mode = 1;
 			tmp.freq = freq_s;
@@ -159,7 +159,7 @@ int main(int argc,char **argv)
 				return -1;
 			}
 
-			/* 设置输出的声音 */
+			/* Setup the volume */
 			cmd = RADIODEV_IOCSETVOL;
 			if (ioctl(fd, cmd, &vol) < 0) {
 				printf("Call cmd fail\n");
