@@ -10,8 +10,9 @@
 #include "../tef665x/tef665x.h"
 
 
-#define r_s_start 9400
-#define r_s_stop  9550
+int r_s_start = 9000;
+int r_s_stop  = 10800;
+int vol = 100;
 
 int radio_cmd, radio_arg;
 char radio_device[100] = "/dev/tef665x";
@@ -31,11 +32,23 @@ int process_cmdline(int argc, char **argv)
 		else if (strcmp(argv[i], "-d") == 0) {
 			strcpy(radio_device, argv[++i]);
 		}
+		else if (strcmp(argv[i], "-s") == 0){
+			r_s_start = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-e") == 0){
+			r_s_stop = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-v") == 0){
+			vol = atoi(argv[++i]);
+		}
 		else if (strcmp(argv[i], "-h") == 0) {
 			printf("\n\nTEF665x -- NXP radio test help --\n\n" \
 			"Syntax: radio-test\n"\
 			" -c <radio ctrl command>\n" \
-			" -d <radio select, /dev/radio>\n");
+			" -d <radio select, /dev/radio>\n"\
+			" -s <radio serch start,[9000]>\n"\
+			" -e <radio serch end,[10800]>\n"\
+			" -v <radio volume,[100]>\n");
 			return -1;
 		}
 	}
@@ -70,7 +83,6 @@ int main(int argc,char **argv)
 	int arg = 0;
 	tune_to_t tmp;
 	tune_status status;
-	int vol = 12;
 	q_data   qdata;
 	int freq_s = 0;
 
@@ -80,7 +92,7 @@ int main(int argc,char **argv)
 
 	fd = radio_start();
 
-	sleep(1);
+	usleep(1);
 
 	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
 	switch (radio_cmd) {
@@ -115,11 +127,11 @@ int main(int argc,char **argv)
 					return -1;
 				}
 
-				sleep(1);
+				usleep(60000);
 
 				/* ²éÑ¯½á¹û */
 				cmd = RADIODEV_IOCGETDATA;
-				qdata.fm = 32;
+				qdata.fm = isfm;
 				if (ioctl(fd, cmd, &qdata) < 0) {
 					printf("Call cmd fail\n");
 					return -1;
