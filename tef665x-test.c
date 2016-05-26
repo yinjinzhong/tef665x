@@ -1,3 +1,13 @@
+/*
+ * For tef665x radio test program
+ * Copyright 2016 HSAEYZ.
+ *
+ * Author: Yin Jinzhong <yinjinzhong@hangsheng.com.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,7 +38,7 @@ int r_s_stop  = 10800;
 int vol = 10;
 
 int radio_cmd, radio_arg;
-static char* deviceName = "/dev/tef665x";
+char radio_device[30] = "/dev/tef665x";
 
 static int continuous = 0;
 
@@ -57,25 +67,17 @@ int process_cmdline(int argc, char **argv)
 {
 	int i;
 
-	radio_cmd=0;
-	radio_arg=0;
-
 	for (i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-c") == 0) {
+		if (strcmp(argv[i], "-c") == 0)
 			radio_cmd = atoi(argv[++i]);
-		}
-		else if (strcmp(argv[i], "-d") == 0) {
-			strcpy(deviceName, argv[++i]);
-		}
-		else if (strcmp(argv[i], "-s") == 0){
+		else if (strcmp(argv[i], "-d") == 0)
+			strcpy(radio_device, argv[++i]);
+		else if (strcmp(argv[i], "-s") == 0)
 			r_s_start = atoi(argv[++i]);
-		}
-		else if (strcmp(argv[i], "-e") == 0){
+		else if (strcmp(argv[i], "-e") == 0)
 			r_s_stop = atoi(argv[++i]);
-		}
-		else if (strcmp(argv[i], "-v") == 0){
+		else if (strcmp(argv[i], "-v") == 0)
 			vol = atoi(argv[++i]);
-		}
 		else if (strcmp(argv[i], "-h") == 0) {
 			printf("\n\nTEF665x -- NXP radio test help --\n\n" \
 			"Syntax: radio-test\n"\
@@ -83,7 +85,8 @@ int process_cmdline(int argc, char **argv)
 			" -d <radio select, /dev/radio>\n"\
 			" -s <radio serch start,[9000]>\n"\
 			" -e <radio serch end,[10800]>\n"\
-			" -v <radio volume,[10]>\n");
+			" -v <radio volume,[10]>\n"\
+			" -h <radio test help.>");
 			return -1;
 		}
 	}
@@ -120,6 +123,7 @@ int main(int argc,char **argv)
 	tune_status status;
 	q_data   qdata;
 	int freq_s = 0;
+	s_resault s_out;
 
 	radio_cmd=0;
 	radio_arg=0;
@@ -237,18 +241,14 @@ int main(int argc,char **argv)
 				usleep(60000);
 
 				/* Read search results */
-				cmd = RADIODEV_IOCGETDATA;
-				qdata.fm = isfm;
-				if (ioctl(fd, cmd, &qdata) < 0) {
+				cmd = RADIODEV_IOCGETAS;
+				s_out.fm = isfm;
+				if (ioctl(fd, cmd, &s_out) < 0) {
 					printf("Call cmd fail\n");
 					return -1;
 				}
-				printf ("Get Data: fm = %d, usn = %d, wam = %d, offset = %d, level = %d\n",
-					qdata.fm, qdata.usn, qdata.wam, qdata.offset, qdata.level);
-				//printf ("Ned Data: fm = 32, usn > 27, wam > 23, offset >100, level < 20\n");
 
-				if ((qdata.usn>27)||(qdata.wam>23)||(qdata.offset>100)||(qdata.level < 20)) continue;
-				else break;
+				if (s_out.resault) break;
 			}
 
 			/* Reset to new frequency */
