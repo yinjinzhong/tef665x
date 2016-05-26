@@ -38,30 +38,10 @@ int r_s_stop  = 10800;
 int vol = 10;
 
 int radio_cmd, radio_arg;
-char radio_device[30] = "/dev/tef665x";
+char deviceName[20] = "/dev/tef665x";
 
 static int continuous = 0;
 
-
-/**
-SIGINT interput handler
-*/
-void StopContCapture(int sig_id) {
-	printf("stoping continuous capture\n");
-	continuous = 0;
-}
-
-void InstallSIGINTHandler() {
-	struct sigaction sa;
-	CLEAR(sa);
-	
-	sa.sa_handler = StopContCapture;
-	if(sigaction(SIGINT, &sa, 0) != 0)
-	{
-		fprintf(stderr,"could not install SIGINT handler, continuous capture disabled");
-		continuous = 0;
-	}
-}
 
 int process_cmdline(int argc, char **argv)
 {
@@ -71,7 +51,7 @@ int process_cmdline(int argc, char **argv)
 		if (strcmp(argv[i], "-c") == 0)
 			radio_cmd = atoi(argv[++i]);
 		else if (strcmp(argv[i], "-d") == 0)
-			strcpy(radio_device, argv[++i]);
+			strcpy(deviceName, argv[++i]);
 		else if (strcmp(argv[i], "-s") == 0)
 			r_s_start = atoi(argv[++i]);
 		else if (strcmp(argv[i], "-e") == 0)
@@ -127,77 +107,6 @@ int main(int argc,char **argv)
 
 	radio_cmd=0;
 	radio_arg=0;
-
-	for (;;) {
-		int index, c = 0;
-
-		system("clear");
-
-		c = getopt_long(argc, argv, short_options, long_options, &index);
-
-		if (-1 == c) {
-			usage(stdout, argc, argv);
-			break;
-		}
-
-		switch (c) {
-			case 0: /* getopt_long() flag */
-				break;
-
-			case 'd':
-				deviceName = optarg;
-				break;
-
-			case 'h':
-				usage(stdout, argc, argv);
-				exit(EXIT_SUCCESS);
-
-			case 'o':
-				break;
-
-			case 'q':
-				break;
-
-			case 'm':
-
-				fprintf(stderr, "You didn't compile for mmap support.\n");
-				exit(EXIT_FAILURE);
-				break;
-
-			case 'r':
-				fprintf(stderr, "You didn't compile for read support.\n");
-				exit(EXIT_FAILURE);
-				break;
-
-			case 'u':
-				fprintf(stderr, "You didn't compile for userptr support.\n");
-				exit(EXIT_FAILURE);
-				break;
-
-			case 'v':
-				printf("Version: %s\n", VERSION);
-				exit(EXIT_SUCCESS);
-				break;
-
-			case 'e':
-				radio_cmd = atoi(optarg);
-				break;
-
-			case 'c':
-				// set flag for continuous capture, interuptible by sigint
-				continuous = 1;
-				InstallSIGINTHandler();
-				break;
-
-			case 'a':
-				radio_arg = atoi(optarg);
-				break;
-
-			default:
-				usage(stderr, argc, argv);
-				exit(EXIT_FAILURE);
-		}
-	}
 
 	fd = radio_start();
 
