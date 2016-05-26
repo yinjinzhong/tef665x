@@ -26,32 +26,24 @@ int r_s_stop  = 10800;
 int vol = 10;
 
 int radio_cmd, radio_arg;
-char radio_device[100] = "/dev/tef665x";
+char radio_device[30] = "/dev/tef665x";
 
 
 int process_cmdline(int argc, char **argv)
 {
 	int i;
 
-	radio_cmd=0;
-	radio_arg=0;
-
 	for (i = 1; i < argc; i++) {
-		if (strcmp(argv[i], "-c") == 0) {
+		if (strcmp(argv[i], "-c") == 0)
 			radio_cmd = atoi(argv[++i]);
-		}
-		else if (strcmp(argv[i], "-d") == 0) {
+		else if (strcmp(argv[i], "-d") == 0)
 			strcpy(radio_device, argv[++i]);
-		}
-		else if (strcmp(argv[i], "-s") == 0){
+		else if (strcmp(argv[i], "-s") == 0)
 			r_s_start = atoi(argv[++i]);
-		}
-		else if (strcmp(argv[i], "-e") == 0){
+		else if (strcmp(argv[i], "-e") == 0)
 			r_s_stop = atoi(argv[++i]);
-		}
-		else if (strcmp(argv[i], "-v") == 0){
+		else if (strcmp(argv[i], "-v") == 0)
 			vol = atoi(argv[++i]);
-		}
 		else if (strcmp(argv[i], "-h") == 0) {
 			printf("\n\nTEF665x -- NXP radio test help --\n\n" \
 			"Syntax: radio-test\n"\
@@ -59,7 +51,8 @@ int process_cmdline(int argc, char **argv)
 			" -d <radio select, /dev/radio>\n"\
 			" -s <radio serch start,[9000]>\n"\
 			" -e <radio serch end,[10800]>\n"\
-			" -v <radio volume,[10]>\n");
+			" -v <radio volume,[10]>\n"\
+			" -h <radio test help.>");
 			return -1;
 		}
 	}
