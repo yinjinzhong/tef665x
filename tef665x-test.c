@@ -1,3 +1,5 @@
+/* For tef665x radio test program */
+
 
 #include <stdio.h>
 #include <string.h>
