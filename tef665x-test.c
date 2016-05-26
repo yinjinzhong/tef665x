@@ -22,18 +22,10 @@
 
 #include "../tef665x/tef665x.h"
 
-<<<<<<< HEAD
-#ifndef VERSION
-#define VERSION "ver: 0.0.1"
-#endif
-
-#define CLEAR(x) memset (&(x), 0, sizeof (x))
-=======
 
 int r_s_start = 9000;
 int r_s_stop  = 10800;
 int vol = 10;
->>>>>>> V01
 
 int radio_cmd, radio_arg;
 static char* deviceName = "/dev/tef665x";
@@ -111,52 +103,11 @@ int radio_start(void)
 	return fd;
 }
 
-<<<<<<< HEAD
-/**
-	print usage information
-*/
-static void usage(FILE* fp, int argc, char** argv)
-{
-	fprintf(fp,
-		"Usage: %s [options]\n\n"
-		"Options:\n"
-		"-d | --device name   Video device name [/dev/tef665x]\n"
-		"-h | --help          Print this message\n"
-		"-o | --output        Set output filename\n"
-		"-q | --quality       Set quality (0-100)\n"
-		"-m | --mmap          Use memory mapped buffers\n"
-		"-r | --read          Use read() calls\n"
-		"-u | --userptr       Use application allocated buffers\n"
-		"-c | --continuous    Do continous capture, stop with SIGINT.\n"
-		"-v | --version       Print version\n"
-		"",
-		argv[0]);
-	}
-
-static const char short_options [] = "d:ho:q:mruW:H:I:ea:vc";
-
-static const struct option
-long_options [] = {
-	{ "device",     required_argument,      NULL,           'd' },
-	{ "help",       no_argument,            NULL,           'h' },
-	{ "output",     required_argument,      NULL,           'o' },
-	{ "quality",    required_argument,      NULL,           'q' },
-	{ "mmap",       no_argument,            NULL,           'm' },
-	{ "read",       no_argument,            NULL,           'r' },
-	{ "userptr",    no_argument,            NULL,           'u' },
-	{ "command",    required_argument,	NULL,           'e' },
-	{ "arg",    	required_argument,	NULL,           'a' },
-	{ "version",	no_argument,		NULL,		'v' },
-	{ "continuous",	no_argument,		NULL,		'c' },
-	{ 0, 0, 0, 0 }
-};
-=======
 int radio_close(int fd)
 {
 	return close(fd);
 }
 
->>>>>>> V01
 
 int main(int argc,char **argv)
 {
@@ -244,30 +195,6 @@ int main(int argc,char **argv)
 		}
 	}
 
-<<<<<<< HEAD
-	fd = radio_setup();
-	sleep(1);
-
-	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
-/*	switch (radio_cmd) {*/
-/*		case 0:*/
-/*			cmd = RADIODEV_IOCGETSTATUS;*/
-/*		break;*/
-
-/*		case 1:*/
-/*			//cmd = RADIODEV_IOCINIT;*/
-/*		break;*/
-
-/*		case 2:*/
-/*			cmd = RADIODEV_IOCTURNTO;*/
-/*		break;*/
-
-/*		default:*/
-/*		break;*/
-/*	}*/
-
-/*	ioctl(fd, cmd, radio_arg);*/
-=======
 	fd = radio_start();
 
 	usleep(1);
@@ -347,8 +274,6 @@ int main(int argc,char **argv)
 		default:
 			break;
 	}
-
->>>>>>> V01
 
         printf("Press q exit\n",ch);
 
