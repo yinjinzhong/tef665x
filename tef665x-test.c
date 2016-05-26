@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,13 +19,21 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+
 #include "../tef665x/tef665x.h"
 
+<<<<<<< HEAD
 #ifndef VERSION
 #define VERSION "ver: 0.0.1"
 #endif
 
 #define CLEAR(x) memset (&(x), 0, sizeof (x))
+=======
+
+int r_s_start = 9000;
+int r_s_stop  = 10800;
+int vol = 10;
+>>>>>>> V01
 
 int radio_cmd, radio_arg;
 static char* deviceName = "/dev/tef665x";
@@ -63,18 +72,26 @@ int process_cmdline(int argc, char **argv)
 		if (strcmp(argv[i], "-c") == 0) {
 			radio_cmd = atoi(argv[++i]);
 		}
-		else if (strcmp(argv[i], "-a") == 0) {
-			radio_arg = atoi(argv[++i]);
-		}
 		else if (strcmp(argv[i], "-d") == 0) {
 			strcpy(deviceName, argv[++i]);
+		}
+		else if (strcmp(argv[i], "-s") == 0){
+			r_s_start = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-e") == 0){
+			r_s_stop = atoi(argv[++i]);
+		}
+		else if (strcmp(argv[i], "-v") == 0){
+			vol = atoi(argv[++i]);
 		}
 		else if (strcmp(argv[i], "-h") == 0) {
 			printf("\n\nTEF665x -- NXP radio test help --\n\n" \
 			"Syntax: radio-test\n"\
 			" -c <radio ctrl command>\n" \
-			" -a <radio ctrl arg>\n" \
-			" -d <radio select, /dev/radio>\n");
+			" -d <radio select, /dev/radio>\n"\
+			" -s <radio serch start,[9000]>\n"\
+			" -e <radio serch end,[10800]>\n"\
+			" -v <radio volume,[10]>\n");
 			return -1;
 		}
 	}
@@ -82,7 +99,7 @@ int process_cmdline(int argc, char **argv)
 	return 0;
 }
 
-int radio_setup(void)
+int radio_start(void)
 {
 	int fd = 0;
 
@@ -94,6 +111,7 @@ int radio_setup(void)
 	return fd;
 }
 
+<<<<<<< HEAD
 /**
 	print usage information
 */
@@ -132,11 +150,25 @@ long_options [] = {
 	{ "continuous",	no_argument,		NULL,		'c' },
 	{ 0, 0, 0, 0 }
 };
+=======
+int radio_close(int fd)
+{
+	return close(fd);
+}
+
+>>>>>>> V01
 
 int main(int argc,char **argv)
 {
+	char ch;
+
 	int fd;  
 	int cmd;
+	int arg = 0;
+	tune_to_t tmp;
+	tune_status status;
+	q_data   qdata;
+	int freq_s = 0;
 
 	radio_cmd=0;
 	radio_arg=0;
@@ -212,6 +244,7 @@ int main(int argc,char **argv)
 		}
 	}
 
+<<<<<<< HEAD
 	fd = radio_setup();
 	sleep(1);
 
@@ -234,8 +267,96 @@ int main(int argc,char **argv)
 /*	}*/
 
 /*	ioctl(fd, cmd, radio_arg);*/
+=======
+	fd = radio_start();
 
-	close(fd);
+	usleep(1);
+
+	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
+	switch (radio_cmd) {
+		case 0:
+		{
+			cmd = RADIODEV_IOCGETOPSTATUS;
+			if (ioctl(fd, cmd, &status) < 0) {
+				printf("Call cmd fail\n");
+				return -1;
+			}
+			printf("The status = %01x\n", status);
+			break;
+		}
+		case 2:
+		{
+			/* Read the opration results */
+			cmd = RADIODEV_IOCGETOPSTATUS;
+			if (ioctl(fd, cmd, &status) < 0) {
+				printf("Call cmd fail\n");
+				return -1;
+			}
+			printf ("Device status = %d\n", status);
+
+			for (freq_s = r_s_start; freq_s < r_s_stop; freq_s+=10)
+			{
+				printf ("Set freq = %d\n", freq_s);
+				/* Start search */
+				cmd = RADIODEV_IOCTURNTO;
+				tmp.mode = 2;
+				tmp.freq = freq_s;
+
+				if (ioctl(fd, cmd, &tmp) < 0) {
+					printf("Call cmd fail\n");
+					return -1;
+				}
+
+				usleep(60000);
+
+				/* Read search results */
+				cmd = RADIODEV_IOCGETDATA;
+				qdata.fm = isfm;
+				if (ioctl(fd, cmd, &qdata) < 0) {
+					printf("Call cmd fail\n");
+					return -1;
+				}
+				printf ("Get Data: fm = %d, usn = %d, wam = %d, offset = %d, level = %d\n",
+					qdata.fm, qdata.usn, qdata.wam, qdata.offset, qdata.level);
+				//printf ("Ned Data: fm = 32, usn > 27, wam > 23, offset >100, level < 20\n");
+
+				if ((qdata.usn>27)||(qdata.wam>23)||(qdata.offset>100)||(qdata.level < 20)) continue;
+				else break;
+			}
+
+			/* Reset to new frequency */
+			cmd = RADIODEV_IOCTURNTO;
+			tmp.mode = 1;
+			tmp.freq = freq_s;
+
+			printf ("Preset freq = %d\n", freq_s);
+
+			if (ioctl(fd, cmd, &tmp) < 0) {
+				printf("Call cmd fail\n");
+				return -1;
+			}
+
+			/* Setup the volume */
+			cmd = RADIODEV_IOCSETVOL;
+			if (ioctl(fd, cmd, &vol) < 0) {
+				printf("Call cmd fail\n");
+				return -1;
+			}
+			break;
+		}
+		default:
+			break;
+	}
+
+>>>>>>> V01
+
+        printf("Press q exit\n",ch);
+
+	while( (ch=getchar())!='q' ){
+		putchar(ch);
+	}
+
+	radio_close(fd);
 
 	return 0;
 }

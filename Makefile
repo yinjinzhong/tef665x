@@ -17,6 +17,8 @@ OBJS  = $(addsuffix .o, $(basename $(SRCS)))
 all:$(OBJS)
 	$(CPP) $(OPT) $(OBJS) -o radio-test
 
+##	./scp_to_remote.sh
+
 clean:
 	rm -f $(OBJS)
 
