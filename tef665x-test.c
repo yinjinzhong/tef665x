@@ -89,6 +89,7 @@ int main(int argc,char **argv)
 	tune_status status;
 	q_data   qdata;
 	int freq_s = 0;
+	s_resault s_out;
 
 	if (process_cmdline(argc, argv) < 0) {
 		return -1;
@@ -136,18 +137,14 @@ int main(int argc,char **argv)
 				usleep(60000);
 
 				/* Read search results */
-				cmd = RADIODEV_IOCGETDATA;
-				qdata.fm = isfm;
-				if (ioctl(fd, cmd, &qdata) < 0) {
+				cmd = RADIODEV_IOCGETAS;
+				s_out.fm = isfm;
+				if (ioctl(fd, cmd, &s_out) < 0) {
 					printf("Call cmd fail\n");
 					return -1;
 				}
-				printf ("Get Data: fm = %d, usn = %d, wam = %d, offset = %d, level = %d\n",
-					qdata.fm, qdata.usn, qdata.wam, qdata.offset, qdata.level);
-				//printf ("Ned Data: fm = 32, usn > 27, wam > 23, offset >100, level < 20\n");
 
-				if ((qdata.usn>27)||(qdata.wam>23)||(qdata.offset>100)||(qdata.level < 20)) continue;
-				else break;
+				if (s_out.resault) break;
 			}
 
 			/* Reset to new frequency */
