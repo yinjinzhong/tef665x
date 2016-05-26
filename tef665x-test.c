@@ -1,5 +1,13 @@
-/* For tef665x radio test program */
-
+/*
+ * For tef665x radio test program
+ * Copyright 2016 HSAEYZ.
+ *
+ * Author: Yin Jinzhong <yinjinzhong@hangsheng.com.cn>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
 
 #include <stdio.h>
 #include <string.h>
