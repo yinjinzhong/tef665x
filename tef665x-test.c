@@ -184,7 +184,7 @@ int main(int argc,char **argv)
 			break;
 	}
 
-        printf("Press q exit\n",ch);
+        printf("Press q exit\n");
 
 	while( (ch=getchar())!='q' ){
 		putchar(ch);
