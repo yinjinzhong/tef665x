@@ -93,6 +93,7 @@ int radio_close(int fd)
 
 int main(int argc,char **argv)
 {
+	char ch;
 	int fd;  
 	int cmd;
 	int arg = 0;
@@ -106,8 +107,6 @@ int main(int argc,char **argv)
 	radio_arg=0;
 
 	fd = radio_start();
-
-	close(fd);
 
 	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
 	switch (radio_cmd) {
@@ -181,7 +180,7 @@ int main(int argc,char **argv)
 			break;
 	}
 
-        printf("Press q exit\n",ch);
+        printf("Press q exit\n");
 
 	while( (ch=getchar())!='q' ){
 		putchar(ch);
