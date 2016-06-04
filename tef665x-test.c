@@ -110,6 +110,8 @@ int main(int argc,char **argv)
 
 	fd = radio_start();
 
+	process_cmdline(argc, argv);
+
 	usleep(1);
 
 	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
@@ -129,7 +131,7 @@ int main(int argc,char **argv)
 			/* Read the opration results */
 			cmd = RADIODEV_IOCGETOPSTATUS;
 			if (ioctl(fd, cmd, &status) < 0) {
-				printf("Call cmd fail\n");
+				printf("Call RADIODEV_IOCGETOPSTATUS fail\n");
 				return -1;
 			}
 			printf ("Device status = %d\n", status);
@@ -143,7 +145,7 @@ int main(int argc,char **argv)
 				tmp.freq = freq_s;
 
 				if (ioctl(fd, cmd, &tmp) < 0) {
-					printf("Call cmd fail\n");
+					printf("Call RADIODEV_IOCTURNTO fail\n");
 					return -1;
 				}
 
@@ -153,7 +155,7 @@ int main(int argc,char **argv)
 				cmd = RADIODEV_IOCGETAS;
 				s_out.fm = isfm;
 				if (ioctl(fd, cmd, &s_out) < 0) {
-					printf("Call cmd fail\n");
+					printf("Call RADIODEV_IOCGETAS fail\n");
 					return -1;
 				}
 
