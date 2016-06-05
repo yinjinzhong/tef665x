@@ -106,83 +106,82 @@ int main(int argc,char **argv)
 	radio_cmd=0;
 	radio_arg=0;
 
-	fd = radio_start();
+	process_cmdline(argc, argv);
+
+	fd = radio_setup();
 
 	printf("cmd = %d, arg = %ld\n", radio_cmd, radio_arg);
 	switch (radio_cmd) {
-		case 0:
-		{
-			cmd = RADIODEV_IOCGETOPSTATUS;
-			if (ioctl(fd, cmd, &status) < 0) {
-				printf("Call cmd fail\n");
-				return -1;
-			}
-			printf("The status = %01x\n", status);
-			break;
+	case 0:
+		cmd = RADIODEV_IOCGETOPSTATUS;
+		if (ioctl(fd, cmd, &status) < 0) {
+			printf("Call cmd fail\n");
+			return -1;
 		}
-		case 2:
-		{
-			/* Read the opration results */
-			cmd = RADIODEV_IOCGETOPSTATUS;
-			if (ioctl(fd, cmd, &status) < 0) {
-				printf("Call cmd fail\n");
-				return -1;
-			}
-			printf ("Device status = %d\n", status);
+		printf("The status = %01x\n", status);
 
-			for (freq_s = r_s_start; freq_s < r_s_stop; freq_s+=10)
-			{
-				printf ("Set freq = %d\n", freq_s);
-				/* Start search */
-				cmd = RADIODEV_IOCTURNTO;
-				tmp.mode = 2;
-				tmp.freq = freq_s;
+		break;
+	case 2:
+		/* Read the opration results */
+		cmd = RADIODEV_IOCGETOPSTATUS;
+		if (ioctl(fd, cmd, &status) < 0) {
+			printf("Call cmd fail\n");
+			return -1;
+		}
+		printf ("Device status = %d\n", status);
 
-				if (ioctl(fd, cmd, &tmp) < 0) {
-					printf("Call cmd fail\n");
-					return -1;
-				}
-
-				usleep(60000);
-
-				/* Read search results */
-				cmd = RADIODEV_IOCGETAS;
-				s_out.fm = isfm;
-				if (ioctl(fd, cmd, &s_out) < 0) {
-					printf("Call cmd fail\n");
-					return -1;
-				}
-
-				if (s_out.resault) break;
-			}
-
-			/* Reset to new frequency */
+		for (freq_s = r_s_start; freq_s < r_s_stop; freq_s+=10) {
+			printf ("Set freq = %d\n", freq_s);
+			/* Start search */
 			cmd = RADIODEV_IOCTURNTO;
-			tmp.mode = 1;
+			tmp.mode = 2;
 			tmp.freq = freq_s;
-
-			printf ("Preset freq = %d\n", freq_s);
 
 			if (ioctl(fd, cmd, &tmp) < 0) {
 				printf("Call cmd fail\n");
 				return -1;
 			}
 
-			/* Setup the volume */
-			cmd = RADIODEV_IOCSETVOL;
-			if (ioctl(fd, cmd, &vol) < 0) {
+			usleep(60000);
+
+			/* Read search results */
+			cmd = RADIODEV_IOCGETAS;
+			s_out.fm = isfm;
+			if (ioctl(fd, cmd, &s_out) < 0) {
 				printf("Call cmd fail\n");
 				return -1;
 			}
-			break;
+
+			if (s_out.resault) break;
 		}
+
+		/* Reset to new frequency */
+		cmd = RADIODEV_IOCTURNTO;
+		tmp.mode = 1;
+		tmp.freq = freq_s;
+
+		printf ("Preset freq = %d\n", freq_s);
+
+		if (ioctl(fd, cmd, &tmp) < 0) {
+			printf("Call cmd fail\n");
+			return -1;
+		}
+
+		/* Setup the volume */
+		cmd = RADIODEV_IOCSETVOL;
+		if (ioctl(fd, cmd, &vol) < 0) {
+			printf("Call cmd fail\n");
+			return -1;
+		}
+			break;
+
 		default:
 			break;
 	}
 
         printf("Press q exit\n");
 
-	while( (ch=getchar())!='q' ){
+	while ((ch=getchar()) != 'q') {
 		putchar(ch);
 	}
 
