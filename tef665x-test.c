@@ -88,7 +88,6 @@ int radio_close(int fd)
 	return close(fd);
 }
 
-
 int main(int argc,char **argv)
 {
 	char ch;
