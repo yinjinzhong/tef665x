@@ -31,7 +31,6 @@
 
 #include "../tef665x/tef665x.h"
 
-
 int r_s_start = 9000;
 int r_s_stop  = 10800;
 int vol = 10;
@@ -40,7 +39,6 @@ int radio_cmd, radio_arg;
 char deviceName[20] = "/dev/tef665x";
 
 static int continuous = 0;
-
 
 int process_cmdline(int argc, char **argv)
 {
