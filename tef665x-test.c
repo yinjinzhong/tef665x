@@ -29,7 +29,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
-#include "../tef665x/tef665x.h"
+#include "tef665x.h"
 
 int r_s_start = 9000;
 int r_s_stop  = 10800;
